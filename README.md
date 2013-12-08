@@ -47,7 +47,7 @@ Create a configuration namespace for your application.
 Define a base configuration map in a namespace somewhere. The base configuration essentially defines your system's default setup.
 
 ```clojure
-(def ^cfj-base base
+(def ^:cfj-base base
 	{
 		:jndi-ds "jdbc/MyLocalDatabase"
 	 	:scheduling
@@ -78,7 +78,7 @@ Define environment specific configuration maps, e.g. for QA region overrides.
 )
 ```
 
-In your application startup function, call the confijulate init function, passing in a reference to your config namespace (where you define your environment and base maps).
+In your application startup function, call the confijulate init-ns function, passing in a reference to your config namespace (where you define your environment and base maps).
 
 ```clojure
 (confijulate.core/init-ns 'my-application.config)
