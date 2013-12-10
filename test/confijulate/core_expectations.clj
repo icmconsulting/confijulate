@@ -1,6 +1,7 @@
 (ns confijulate.core-expectations
 	(:use expectations
-				[confijulate core env test-namespace]))
+				[confijulate core env test-namespace])
+	(:require [me.raynes.fs :as fs]))
 
 
 ;; namespace doesn't exist throws exception
@@ -82,3 +83,53 @@
 															confijulate.test-namespace/base base-config
 															confijulate.test-namespace/other env-config]
 									(init-ns 'confijulate.test-namespace)))))
+
+;; Specifying a non existant file throws exception
+(expect
+ RuntimeException
+ (let [base-config (with-meta {:item 1} {:cfj-base true})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-file (constantly "this-file-doesnt-exist.clj")
+															confijulate.test-namespace/base base-config]
+									(init-ns 'confijulate.test-namespace)))))
+
+;; Specifying an empty config file throws exception
+(expect
+ RuntimeException
+ (let [base-config (with-meta {:item 1} {:cfj-base true})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/empty_config_file.clj"))
+															confijulate.test-namespace/base base-config]
+									(init-ns 'confijulate.test-namespace)))))
+
+;; If the file contents are not a map, should throw exception
+(expect
+ RuntimeException
+ (let [base-config (with-meta {:item 1} {:cfj-base true})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/not_a_map_config_file.clj"))
+															confijulate.test-namespace/base base-config]
+									(init-ns 'confijulate.test-namespace)))))
+
+
+(given [config-key config-value]
+	(expect
+	 config-value
+	 (let [base-config (with-meta {:item 1} {:cfj-base true})]
+		 (redef-state [confijulate.core]
+									(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/non_overriding_config_file.clj"))
+																confijulate.test-namespace/base base-config]
+										(init-ns 'confijulate.test-namespace)
+										(get-cfg config-key)))))
+	:other-value 2
+	:item 1)
+
+
+(expect
+	 1000
+	 (let [base-config (with-meta {:item 1} {:cfj-base true})]
+		 (redef-state [confijulate.core]
+									(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/overriding_config_file.clj"))
+																confijulate.test-namespace/base base-config]
+										(init-ns 'confijulate.test-namespace)
+										(get-cfg :item)))))
