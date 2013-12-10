@@ -2,6 +2,8 @@
 
 Simple clojure application configuration library.
 
+NOTE: this is still very much a work in progress.
+
 ## What?
 
 Manage your environment specific constants using clojure constructs (maps). What every enterprise-y application needs!
