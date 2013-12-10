@@ -2,7 +2,7 @@
 
 Simple clojure application configuration library.
 
-NOTE: this is still very much a work in progress.
+NOTE: this is still very much a work in progress. This isn't available in clojars yet, but feel free to download the source and use until then.
 
 ## What?
 
@@ -42,8 +42,7 @@ If the path queried for doesn't exist (falsey) in the top level of the confijula
 
 Create a configuration namespace for your application.
 ```clojure
-(ns my-application.config
-	(:use confijulate.core))
+(ns my-application.config)
 ```
 
 Define a base configuration map in a namespace somewhere. The base configuration essentially defines your system's default setup.
@@ -113,7 +112,26 @@ Then wherever your application needs environment specific values, call the confi
 
 
 ## Command line/System/Environment overrides
-TODO
+Values loaded from an external configuration map takes precedence above any values defined in your configuration
+namespace.
+
+To load an external configuration file, add the following command line argument to your jvm startup command:
+
+```
+-Dcfj-file=/path/to/file
+```
+
+It's expected that the file contains just a clojure map, for example:
+```clojure
+;; This is all that should be in the file
+{
+	:my-value 2
+	:my-subsystem {
+		:some-other-value 2
+	}
+}
+```
+
 
 ## In unit/integration tests
 TODO
@@ -127,6 +145,6 @@ TODO
 
 ## License
 
-Copyright © 2013 ICM Consulting
+Copyright © 2013 ICM Consulting http://www.icm-consulting.com.au
 
 Distributed under the Eclipse Public License, the same as Clojure.
