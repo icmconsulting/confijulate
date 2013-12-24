@@ -6,14 +6,14 @@ Simple clojure application configuration library.
 In leiningen:
 
 ```
-[org.clojars.icm-consulting/confijulate "0.1.0-SNAPSHOT"]
+[confijulate "0.1.0-SNAPSHOT"]
 ```
 
 In Maven:
 
 ```
 <dependency>
-  <groupId>org.clojars.icm-consulting</groupId>
+  <groupId>confijulate</groupId>
   <artifactId>confijulate</artifactId>
   <version>0.1.0-SNAPSHOT</version>
 </dependency>
