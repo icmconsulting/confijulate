@@ -18,7 +18,7 @@ A "confijulate" application configuration consists of:
 When your application starts, a confijulate config hierachy is created.
 
 ```
-VALUE OVERRIDES (e.g. -Dcfj:example-value="newValue")
+EXTENSION VALUE OVERRIDES (e.g. -Dcfj.example-value=newValue)
 	||
   \/
 EXTERNAL CONFIG MAP (e.g. -Dcfj-file="/var/app/config/test-config.clj")
@@ -133,6 +133,22 @@ It's expected that the file contains just a clojure map, for example:
 	}
 }
 ```
+
+You can also override single values via system properties. For example, in the above map file, if you decided you needed
+:some-other-value to be "A" instead, you would add this system property:
+
+```
+-Dcfj.my-subsystem.some-other-value=A
+```
+Essentially, this creates
+
+There are a few caveats when using this option.
+1. The type of the values returned from the get-cfg function will ALWAYS be a string.
+2. If you doing something silly like...
+```
+	-Dcfj.item=1 -Dcfj.item.sub-value=2
+```
+...then, you're on your own - I cannot help you.
 
 
 ## In unit/integration tests

@@ -183,3 +183,15 @@
 															confijulate.test-namespace/other env-config]
 									(init-ns 'confijulate.test-namespace)
 									(get-cfg :sub-map-merge)))))
+
+
+;; When an extension value is specified via system property
+;; Then when querying for that value, the overriding value should be returned
+(expect
+ "3"
+ (let [base-config (with-meta {:item 1} {:cfj-base true})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-extension-values (constantly {"item" "3"})
+															confijulate.test-namespace/base base-config]
+									(init-ns 'confijulate.test-namespace)
+									(get-cfg :item)))))

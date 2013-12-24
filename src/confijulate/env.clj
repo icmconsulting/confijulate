@@ -11,16 +11,11 @@
 	(System/getProperty "cfj-file"))
 
 (defn cfj-extension-values
-	"Returns a seq of all extension values specified via the command line"
+	"Returns a map of all cfj extension values specified via the command line"
 	[]
-	(let [all-property-names (-> (System/getProperties) .propertyNames enumeration-seq)]
-		(->>
-		 all-property-names
-		 (filter #())
-
-		 )
-		;;TODO
-
-		)
-
-	)
+	(let [all-property-names (-> (System/getProperties) .propertyNames enumeration-seq)
+				property-re #"^cfj\.(.+)"
+				cfj-property-names (filter #(re-find property-re %) all-property-names)]
+		(zipmap
+		 (map #(-> (re-find property-re %) last) cfj-property-names)
+		 (map #(System/getProperty %) cfj-property-names))))

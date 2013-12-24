@@ -23,13 +23,35 @@
 
 (defn- parse-selected-config-file
 	[selected-file]
-	(when-not (fs/exists? selected-file) (throw (ex-info (str "Cannot find selected configuration file at path " selected-file) {:file selected-file})))
-	(let [config-map (edn/read-string (slurp selected-file))]
-		(cond
-		 (nil? config-map) (throw (ex-info (str "No configuration map can be found in file at path " selected-file) {:file selected-file}))
-		 (not (map? config-map)) (throw (ex-info (str "File at path " selected-file " does not contain a map") {:file selected-file}))
-		 :else config-map)))
+	(if-not (fs/exists? selected-file)
+		(throw (ex-info (str "Cannot find selected configuration file at path " selected-file) {:file selected-file}))
+		(let [config-map (edn/read-string (slurp selected-file))]
+			(cond
+			 (nil? config-map) (throw (ex-info (str "No configuration map can be found in file at path " selected-file) {:file selected-file}))
+			 (not (map? config-map)) (throw (ex-info (str "File at path " selected-file " does not contain a map") {:file selected-file}))
+			 :else config-map))))
 
+(defn- safely-assoc?
+	([m ks] (safely-assoc? m (butlast ks) 1 []))
+	([m ks key-num maps?]
+	 (if (> key-num (count ks))
+		 (or (not (seq maps?)) (every? true? maps?))
+		 (let [test-val (get-in m (take key-num ks))]
+				(safely-assoc? m ks (inc key-num) (conj maps? (or (nil? test-val) (map? test-val))))))))
+
+
+(defn- ext-value-map
+	[ext-values]
+	(let [ext-keys (map key ext-values)]
+		(reduce
+		 (fn [m k]
+			 (let [key-coords (map keyword (clojure.string/split (key k) #"\."))]
+					(if (safely-assoc? m key-coords)
+						(assoc-in m key-coords (val k))
+						(throw
+						 (ex-info (format "Extension value with key %s cannot be used because it overrides another value at a higher level key" (key k))
+											{:key-coords key-coords})))))
+		 {} ext-values)))
 
 (defn init-ns
 	"Initialise an application configuration, using interns defined within the given namespace.
@@ -46,12 +68,13 @@
 		(let [base-map (base-map-from-ns config-ns)
 					selected-file (cfj-file)
 					file-map (if selected-file (parse-selected-config-file selected-file) {})
+					ext-values-map (ext-value-map (cfj-extension-values))
 					selected-env (cfj-env)
 					env-map (when selected-env (env-map-from-ns config-ns selected-env))]
 			(cond
 			 (nil? base-map) (throw (ex-info "Cannot find base config map in namespace" {:ns config-ns}))
 			 (and selected-env (not env-map)) (throw (ex-info (format "Cannot find env config %s in namespace" selected-env) {:ns config-ns}))
-			 :else (swap! config-heirachy conj file-map (if env-map env-map {}) base-map)))
+			 :else (swap! config-heirachy conj ext-values-map file-map (if env-map env-map {}) base-map)))
 
 		(ex-info "Cannot find namespace" {:ns config-ns})))
 
