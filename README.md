@@ -110,6 +110,8 @@ Then wherever your application needs environment specific values, call the confi
 ;; 	define a value for the above path, so the "base" default value is returned => "00 00 10 * * ?"
 ```
 
+If the value being returned is a map, then the map (and any map values in the map) will be merged down the heirarchy.
+
 
 ## Command line/System/Environment overrides
 Values loaded from an external configuration map takes precedence above any values defined in your configuration
