@@ -133,3 +133,53 @@
 																confijulate.test-namespace/base base-config]
 										(init-ns 'confijulate.test-namespace)
 										(get-cfg :item)))))
+
+
+;; When a map value is requested...
+
+;; Given there is only a base config
+;; Should only return the map value in the base map
+(expect
+ {:item 1}
+ (let [base-config (with-meta {:config-map {:item 1}} {:cfj-base true})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.test-namespace/base base-config]
+									(init-ns 'confijulate.test-namespace)
+									(get-cfg :config-map)))))
+
+;; Given there is a base map and other overridding map
+;; Should return matching merged map
+(expect
+ {:item 2 :second-item 3 :other-item 2}
+ (let [base-config (with-meta {:config-map {:item 1 :second-item 3}} {:cfj-base true})
+			 env-config (with-meta {:config-map {:item 2 :other-item 2}} {:cfj-env "other"})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-env (constantly "other")
+															confijulate.test-namespace/base base-config
+															confijulate.test-namespace/other env-config]
+									(init-ns 'confijulate.test-namespace)
+									(get-cfg :config-map)))))
+
+(expect
+ {:item 3 :second-item 3 :other-item 3 :new-value "A"}
+ (let [base-config (with-meta {:config-map {:item 1 :second-item 3}} {:cfj-base true})
+			 env-config (with-meta {:config-map {:item 2 :other-item 2}} {:cfj-env "other"})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/overriding_config_file.clj"))
+															confijulate.env/cfj-env (constantly "other")
+															confijulate.test-namespace/base base-config
+															confijulate.test-namespace/other env-config]
+									(init-ns 'confijulate.test-namespace)
+									(get-cfg :config-map)))))
+
+(expect
+ {:merged-map {:item 1 :sub-map {:item 2}}}
+ (let [base-config (with-meta {:sub-map-merge {:merged-map {:item 1 :sub-map {:item 0}}}} {:cfj-base true})
+			 env-config (with-meta {:sub-map-merge {:merged-map {:sub-map {:item 1}}}} {:cfj-env "other"})]
+	 (redef-state [confijulate.core]
+								(with-redefs [confijulate.env/cfj-file (constantly (fs/absolute-path "test/overriding_config_file.clj"))
+															confijulate.env/cfj-env (constantly "other")
+															confijulate.test-namespace/base base-config
+															confijulate.test-namespace/other env-config]
+									(init-ns 'confijulate.test-namespace)
+									(get-cfg :sub-map-merge)))))

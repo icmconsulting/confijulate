@@ -40,8 +40,7 @@
 	Additionally, looks for the following system properties:
 		- cfj-file => loads map from the file at the given path. The values in this map will take precedence before values in the ns maps
 
-	Returns the original configuration namespace.
-	"
+	Returns the seq of config maps in precedence order."
 	[config-ns]
 	(if-let [config-ns (find-ns config-ns)]
 		(let [base-map (base-map-from-ns config-ns)
@@ -57,6 +56,15 @@
 		(ex-info "Cannot find namespace" {:ns config-ns})))
 
 
+(defn- merge-config-maps
+	[config-maps]
+	"({:item 1, :second-item 3} {:item 2, :other-item 2})"
+	(let [merged-map (apply merge config-maps)
+				maps-to-merge (map key (filter #(map? (val %)) merged-map))
+				merged-maps (zipmap maps-to-merge (map #(merge-config-maps (map % config-maps)) maps-to-merge))]
+			(merge merged-map merged-maps)))
+
+
 (defn get-cfg
 	"Get the first value that matches the given map path defined in kws.
 	Searches the config heirachy in the following order:
@@ -65,4 +73,7 @@
 	If no value can be found in any config map via the given path, returns nil.
 	"
 	[& kws]
-	(some #(get-in % kws) @config-heirachy))
+	(if-let [cfg-val (some #(get-in % kws) @config-heirachy)]
+		(if (map? cfg-val)
+			(merge-config-maps (reverse (map #(get-in % kws) @config-heirachy)))
+			cfg-val)))

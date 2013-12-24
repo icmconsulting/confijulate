@@ -10,4 +10,17 @@
 	[]
 	(System/getProperty "cfj-file"))
 
+(defn cfj-extension-values
+	"Returns a seq of all extension values specified via the command line"
+	[]
+	(let [all-property-names (-> (System/getProperties) .propertyNames enumeration-seq)]
+		(->>
+		 all-property-names
+		 (filter #())
 
+		 )
+		;;TODO
+
+		)
+
+	)
