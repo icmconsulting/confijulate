@@ -2,7 +2,22 @@
 
 Simple clojure application configuration library.
 
-NOTE: this is still very much a work in progress. This isn't available in clojars yet, but feel free to download the source and use until then.
+# Install
+In leiningen:
+
+```
+[org.clojars.icm-consulting/confijulate "0.1.0-SNAPSHOT"]
+```
+
+In Maven:
+
+```
+<dependency>
+  <groupId>org.clojars.icm-consulting</groupId>
+  <artifactId>confijulate</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
 
 ## What?
 
