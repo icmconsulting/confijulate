@@ -147,6 +147,6 @@ TODO
 
 ## License
 
-Copyright © 2013 ICM Consulting http://www.icm-consulting.com.au
+Copyright © 2013 ICM Consulting Pty Ltd. http://www.icm-consulting.com.au
 
 Distributed under the Eclipse Public License, the same as Clojure.
