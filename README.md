@@ -59,8 +59,7 @@ Create a configuration namespace for your application.
 ```clojure
 (ns
 	^:cfj-config
-	my-application.config
-	(:use [confijurate.core :only [init-ns]]))
+	my-application.config)
 ```
 
 Define a base configuration map in the config namespace. The base configuration essentially defines your system's default setup.
@@ -112,7 +111,20 @@ Then, wherever your application needs environment specific values, call the conf
 If the value being returned is a map, then the map (and any map values in the map) will be merged down the heirarchy.
 
 
-The first time get-cfg is called, it will initialise a heirachy of configuration maps.
+The first time get-cfg is called, it will initialise a heirachy of configuration maps. However, your config namespace needs to be required at some stage in your ns graph, otherwise you confijulate won't be able to find it.
+The easiest way to get around this issue, is to "alias" the confijulate.core/get-cfg function from within your configuration namespace.
+
+```clojure
+(ns
+	^:cfj-config
+	my-application.config
+	(:require [confijurate.core :as cfj]))
+
+(def get-cfg cfj/get-cfg)
+```
+
+The advantage of this approach is that you contain the confijulate dependencies in your app to just your configuration namespace.
+Wherever you need a config value, just call the aliased function in your config namespace.
 
 
 ## Command line/System/Environment overrides
