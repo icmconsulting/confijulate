@@ -197,9 +197,34 @@
 ;; Then when querying for that value, the overriding value should be returned
 (expect
  "3"
- (let [base-config (with-meta {:item 1} {:cfj-base true})]
+ (let [base-config {:item 1}]
 
 	 (with-redefs [confijulate.env/cfj-extension-values (constantly {"item" "3"})]
 		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
 		 (init-ns 'confijulate.test-namespace)
 		 (get-cfg :item))))
+
+
+;; If the configuration namespace isn't initialised, then should search for the namespace
+(expect
+ 1
+ (let [base-config {:item 1}]
+	 	 (alter-meta! (find-ns 'confijulate.test-namespace) assoc :cfj-config true)
+		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
+		 (get-cfg :item)))
+
+;; No config namespace specified
+(expect
+ RuntimeException
+ (let [base-config {:item 1}]
+		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
+		 (get-cfg :item)))
+
+;; Multiple config namespaces specified
+(expect
+ RuntimeException
+ (let [base-config {:item 1}]
+ 	 	 (alter-meta! (find-ns 'confijulate.expectations) assoc :cfj-config true)
+ 	 	 (alter-meta! (find-ns 'confijulate.test-namespace) assoc :cfj-config true)
+		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
+		 (get-cfg :item)))

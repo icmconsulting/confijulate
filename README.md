@@ -57,10 +57,13 @@ If the path queried for doesn't exist (falsey) in the top level of the confijula
 
 Create a configuration namespace for your application.
 ```clojure
-(ns my-application.config)
+(ns
+	^:cfj-config
+	my-application.config
+	(:use [confijurate.core :only [init-ns]]))
 ```
 
-Define a base configuration map in a namespace somewhere. The base configuration essentially defines your system's default setup.
+Define a base configuration map in the config namespace. The base configuration essentially defines your system's default setup.
 
 ```clojure
 (def ^:cfj-base base
@@ -94,26 +97,7 @@ Define environment specific configuration maps, e.g. for QA region overrides.
 )
 ```
 
-In your application startup function, call the confijulate init-ns function, passing in a reference to your config namespace (where you define your environment and base maps).
-
-```clojure
-(confijulate.core/init-ns 'my-application.config)
-```
-
-For example, for a standard ring based web application, you would call the init function in the ring init function:
-
-```clojure
-:ring {:handler my-application.handler/app
-         :init my-application.handler/init-hook}
-
-;; ...meanwhile, in my-application.handler...
-
-(defn init-hook
-	[]
-	(confijulate.core/init-ns 'my-application.config))
-```
-
-Then wherever your application needs environment specific values, call the confijulate get-cfg function.
+Then, wherever your application needs environment specific values, call the confijulate get-cfg function.
 
 ```clojure
 (def daily-email-schedule
@@ -126,6 +110,9 @@ Then wherever your application needs environment specific values, call the confi
 ```
 
 If the value being returned is a map, then the map (and any map values in the map) will be merged down the heirarchy.
+
+
+The first time get-cfg is called, it will initialise a heirachy of configuration maps.
 
 
 ## Command line/System/Environment overrides
@@ -163,6 +150,22 @@ There are a few caveats when using this option.
 	-Dcfj.item=1 -Dcfj.item.sub-value=2
 ```
 ...then, you're on your own - I cannot help you.
+
+## Force initialisation
+
+There might be a few reasons why you need to force the configuration to initialise itself. These include:
+
+- There are more than 1 namespace in your application with cfj-config metadata
+- The parameters that set up the configuration have changed (e.g. via System/setProperty)
+- For some reason, you don't want to use the cfj-config metadata
+
+To force initialisation, in your application bootstrap function, call:
+
+```clojure
+(confijulate.core/init-ns 'my.config-namespace)
+```
+
+The namespace referred to above doesn't need to have the cfj-config metadata attached.
 
 
 ## In unit/integration tests

@@ -62,40 +62,61 @@
 	Additionally, looks for the following system properties:
 		- cfj-file => loads map from the file at the given path. The values in this map will take precedence before values in the ns maps
 
-	Returns the seq of config maps in precedence order."
+	Returns the seq of config maps in precedence order.
+
+	You shouldn't need to call this function directly, if you mark your configuration namespace with the cfj-config metadata flag.
+	Some reasons that you MIGHT need to call this include:
+	- There are more than 1 namespace in your application with a cfj-config namespace
+	- The parameters that set up the configuration have changed (e.g. via System/setProperty)
+	- For some reason, you don't want to use the cfj-config metadata"
 	[config-ns]
 	(if-let [config-ns (find-ns config-ns)]
-		(let [base-map (base-map-var-from-ns config-ns)
-					selected-file (cfj-file)
-					file-map (if selected-file (parse-selected-config-file selected-file) {})
-					ext-values-map (ext-value-map (cfj-extension-values))
-					selected-env (cfj-env)
-					env-map (when selected-env (env-map-var-from-ns config-ns selected-env))]
-			(cond
-			 (nil? base-map) (throw (ex-info "Cannot find base config map in namespace" {:ns config-ns}))
-			 (and selected-env (not env-map)) (throw (ex-info (format "Cannot find env config %s in namespace" selected-env) {:ns config-ns}))
-			 :else (swap! config-heirachy conj ext-values-map file-map (if env-map (var-get env-map) {}) (var-get base-map))))
+		(do
+			(swap! config-heirachy (constantly []))
+			(let [base-map (base-map-var-from-ns config-ns)
+						selected-file (cfj-file)
+						file-map (if selected-file (parse-selected-config-file selected-file) {})
+						ext-values-map (ext-value-map (cfj-extension-values))
+						selected-env (cfj-env)
+						env-map (when selected-env (env-map-var-from-ns config-ns selected-env))]
+				(cond
+				 (nil? base-map) (throw (ex-info "Cannot find base config map in namespace" {:ns config-ns}))
+				 (and selected-env (not env-map)) (throw (ex-info (format "Cannot find env config %s in namespace" selected-env) {:ns config-ns}))
+				 :else (swap! config-heirachy conj ext-values-map file-map (if env-map (var-get env-map) {}) (var-get base-map)))))
 
 		(ex-info "Cannot find namespace" {:ns config-ns})))
 
 
 (defn- merge-config-maps
 	[config-maps]
-	"({:item 1, :second-item 3} {:item 2, :other-item 2})"
 	(let [merged-map (apply merge config-maps)
 				maps-to-merge (map key (filter #(map? (val %)) merged-map))
 				merged-maps (zipmap maps-to-merge (map #(merge-config-maps (map % config-maps)) maps-to-merge))]
 			(merge merged-map merged-maps)))
 
+(defn- find-and-init-config-ns
+	[]
+	(let [config-namespaces (filter #(:cfj-config (meta %)) (all-ns))]
+		(cond
+		 (< 1 (count config-namespaces)) (throw (ex-info "More than 1 possible configuration namespaces found. You may need to use init-ns" {:namespaces config-namespaces}))
+		 (not (seq config-namespaces)) (throw (ex-info "No configuration namespaces found. Make sure you add the :cfj-config metadata to your namespace" {:namespaces config-namespaces}))
+		 :else (init-ns (ns-name (first config-namespaces))))))
 
 (defn get-cfg
 	"Get the first value that matches the given map path defined in kws.
 	Searches the config heirachy in the following order:
-	1. Specified env config, if any
-	2. Base config
+	1. Ext system property values
+	2. External file, specified via cfj-file system property
+	3. Specified env config, if any
+	4. Base config
 	If no value can be found in any config map via the given path, returns nil.
+	Note: if the configuration has not yet been initialised, will search for a configuration
+	namespace that shares a common base namespace with the current namespace...
 	"
 	[& kws]
+
+	(when-not (seq @config-heirachy) (find-and-init-config-ns))
+
 	(if-let [cfg-val (some #(get-in % kws) @config-heirachy)]
 		(if (map? cfg-val)
 			(merge-config-maps (reverse (map #(get-in % kws) @config-heirachy)))
