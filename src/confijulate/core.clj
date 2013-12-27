@@ -96,7 +96,6 @@
 
 (defn- find-and-init-config-ns
 	[]
-	(println (all-ns))
 	(let [config-namespaces (filter #(:cfj-config (meta %)) (all-ns))]
 		(cond
 		 (< 1 (count config-namespaces)) (throw (ex-info "More than 1 possible configuration namespaces found. You may need to use init-ns" {:namespaces config-namespaces}))
