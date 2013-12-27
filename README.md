@@ -6,7 +6,7 @@ Simple clojure application configuration library.
 In leiningen:
 
 ```
-[confijulate "0.1.0-SNAPSHOT"]
+[confijulate "0.2.0-SNAPSHOT"]
 ```
 
 In Maven:
