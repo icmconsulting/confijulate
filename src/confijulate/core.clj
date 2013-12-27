@@ -5,19 +5,19 @@
 
 (def config-heirachy (atom []))
 
-(defn- base-map-from-ns
+(defn- base-map-var-from-ns
 	[config-ns]
 	(->>
 	 (ns-interns config-ns)
-	 (map #(-> (val %) var-get))
+	 (map val)
 	 (filter #(-> (meta %) :cfj-base))
 	 first))
 
-(defn- env-map-from-ns
+(defn- env-map-var-from-ns
 	[config-ns env]
 	(->>
 	 (ns-interns config-ns)
-	 (map #(-> (val %) var-get))
+	 (map val)
 	 (filter #(-> (meta %) :cfj-env (= env)))
 	 first))
 
@@ -65,16 +65,16 @@
 	Returns the seq of config maps in precedence order."
 	[config-ns]
 	(if-let [config-ns (find-ns config-ns)]
-		(let [base-map (base-map-from-ns config-ns)
+		(let [base-map (base-map-var-from-ns config-ns)
 					selected-file (cfj-file)
 					file-map (if selected-file (parse-selected-config-file selected-file) {})
 					ext-values-map (ext-value-map (cfj-extension-values))
 					selected-env (cfj-env)
-					env-map (when selected-env (env-map-from-ns config-ns selected-env))]
+					env-map (when selected-env (env-map-var-from-ns config-ns selected-env))]
 			(cond
 			 (nil? base-map) (throw (ex-info "Cannot find base config map in namespace" {:ns config-ns}))
 			 (and selected-env (not env-map)) (throw (ex-info (format "Cannot find env config %s in namespace" selected-env) {:ns config-ns}))
-			 :else (swap! config-heirachy conj ext-values-map file-map (if env-map env-map {}) base-map)))
+			 :else (swap! config-heirachy conj ext-values-map file-map (if env-map (var-get env-map) {}) (var-get base-map))))
 
 		(ex-info "Cannot find namespace" {:ns config-ns})))
 

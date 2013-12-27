@@ -77,7 +77,7 @@ Define a base configuration map in a namespace somewhere. The base configuration
 Define environment specific configuration maps, e.g. for QA region overrides.
 
 ```clojure
-(def ^{cfj-env :test} test-config
+(def ^{cfj-env "test"} test-config
 	{
 		:jndi-ds "jdbc/MyTestDatabase"
 	 	:scheduling
@@ -87,7 +87,7 @@ Define environment specific configuration maps, e.g. for QA region overrides.
 	}
 )
 
-(def ^{cfj-env :prod} prod-config
+(def ^{cfj-env "prod"} prod-config
 	{
 		:jndi-ds "jdbc/MyProdDatabase"
 	}
@@ -155,7 +155,6 @@ You can also override single values via system properties. For example, in the a
 ```
 -Dcfj.my-subsystem.some-other-value=A
 ```
-Essentially, this creates
 
 There are a few caveats when using this option.
 1. The type of the values returned from the get-cfg function will ALWAYS be a string.
