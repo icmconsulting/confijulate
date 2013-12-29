@@ -6,7 +6,7 @@ Simple clojure application configuration library.
 In leiningen:
 
 ```
-[confijulate "0.2.0-SNAPSHOT"]
+[confijulate "0.3.0-SNAPSHOT"]
 ```
 
 In Maven:
@@ -15,7 +15,7 @@ In Maven:
 <dependency>
   <groupId>confijulate</groupId>
   <artifactId>confijulate</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -111,7 +111,7 @@ Then, wherever your application needs environment specific values, call the conf
 If the value being returned is a map, then the map (and any map values in the map) will be merged down the heirarchy.
 
 
-The first time get-cfg is called, it will initialise a heirachy of configuration maps. However, your config namespace needs to be required at some stage in your ns graph, otherwise you confijulate won't be able to find it.
+The first time get-cfg is called, it will initialise a heirachy of configuration maps. However, your config namespace needs to be required at some stage in your ns graph, otherwise confijulate won't be able to find it.
 The easiest way to get around this issue, is to "alias" the confijulate.core/get-cfg function from within your configuration namespace.
 
 ```clojure
@@ -175,6 +175,12 @@ To force initialisation, in your application bootstrap function, call:
 
 ```clojure
 (confijulate.core/init-ns 'my.config-namespace)
+```
+
+Or from within the configuration namespace itself:
+
+```clojure
+(confijulate.core/init-ns *ns*)
 ```
 
 The namespace referred to above doesn't need to have the cfj-config metadata attached.
