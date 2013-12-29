@@ -103,8 +103,8 @@ Then, wherever your application needs environment specific values, call the conf
 	(confijulate.core/get-cfg :scheduling :daily :cron))
 
 ;; If no environment command line/system arg specified, then base is used => "00 00 10 * * ?"
-;; If -Dcfj-region=test sent via command line, then "test" map is used => "00 15 11 * * ?"
-;; If -Dcfj-region=prod sent via command line, then "prod" map is used. But prod does not
+;; If -Dcfj-env=test sent via command line, then "test" map is used => "00 15 11 * * ?"
+;; If -Dcfj-env=prod sent via command line, then "prod" map is used. But prod does not
 ;; 	define a value for the above path, so the "base" default value is returned => "00 00 10 * * ?"
 ```
 
@@ -184,10 +184,6 @@ Or from within the configuration namespace itself:
 ```
 
 The namespace referred to above doesn't need to have the cfj-config metadata attached.
-
-
-## In unit/integration tests
-TODO
 
 
 ## TODO
