@@ -117,7 +117,7 @@
 (defmethod init-ns clojure.lang.Namespace [ns]
 	(init-ns* ns))
 
-(defmethod init-ns java.lang.String [ns-name]
+(defmethod init-ns clojure.lang.Symbol [ns-name]
 	(if-let [found-ns (find-ns ns-name)]
 		(init-ns* found-ns)
 		(ex-info "Cannot find namespace" {:ns ns-name})))
