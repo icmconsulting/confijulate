@@ -126,6 +126,20 @@ The easiest way to get around this issue, is to "alias" the confijulate.core/get
 The advantage of this approach is that you contain the confijulate dependencies in your app to just your configuration namespace.
 Wherever you need a config value, just call the aliased function in your config namespace.
 
+#### Note on namespace metadata
+There is a long oustanding bug in [Clojure](http://dev.clojure.org/jira/browse/CLJ-130) where the AOT compiler strips out ns metadata - this is evident when running lein commands such as "ring uberwar".
+
+The workaround for this issue is to do what clojure.core does, and explicitly alter the ns metadata while constructing the ns.
+
+```clojure
+(ns
+	^:cfj-config
+	my-application.config)
+
+;; SNIP
+
+(alter-meta! (find-ns 'my-application.config) assoc :cfj-config true)
+```
 
 ## Command line/System/Environment overrides
 Values loaded from an external configuration map takes precedence above any values defined in your configuration

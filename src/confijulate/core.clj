@@ -129,7 +129,7 @@
 	(let [config-namespaces (filter #(:cfj-config (meta %)) (all-ns))]
 		(cond
 		 (< 1 (count config-namespaces)) (throw (ex-info "More than 1 possible configuration namespaces found. You may need to use init-ns" {:namespaces config-namespaces}))
-		 (not (seq config-namespaces)) (throw (ex-info "No configuration namespaces found. Make sure you add the :cfj-config metadata to your namespace" {:namespaces config-namespaces}))
+		 (not (seq config-namespaces)) (throw (ex-info "No configuration namespaces found. Make sure you add the :cfj-config metadata to your namespace" {:all-namespace (all-ns)}))
 		 :else (init-ns* (first config-namespaces)))))
 
 (defn get-cfg
