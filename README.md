@@ -36,10 +36,10 @@ When your application starts, a confijulate config hierachy is created.
 EXTENSION VALUE OVERRIDES (e.g. -Dcfj.example-value=newValue)
 	||
   \/
-EXTERNAL CONFIG MAP (e.g. -Dcfj-file="/var/app/config/test-config.clj")
+EXTERNAL CONFIG MAP (e.g. -Dcfj-file=/var/app/config/test-config.clj)
 	||
   \/
-ENVIRONMENT CONFIG
+ENVIRONMENT CONFIG (e.g. -Dcfj-env=test)
 	||
   \/
 BASE CONFIG
