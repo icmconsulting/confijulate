@@ -170,12 +170,15 @@ You can also override single values via system properties. For example, in the a
 ```
 
 There are a few caveats when using this option.
-1. The type of the values returned from the get-cfg function will ALWAYS be a string.
-2. If you doing something silly like...
+1. The type of the values returned from the get-cfg function will default to be a String.
+2. If you need it to be an Integer or a Boolean then prefix the values as follows:
 ```
-	-Dcfj.item=1 -Dcfj.item.sub-value=2
+	-Dcfj.my-boolean=#s->b#true -Dcfj.my-integer=#s->i#2
 ```
-...then, you're on your own - I cannot help you.
+...this calls the function between the #'s (i.e. s->b and s->i) in the namespace confijulate.coerce to convert the Strings. Alternatively you can call your own function with the fully qualified namespace. E.g.
+```
+	-Dcfj.my-value=#my-namespace/my-function#xyz987
+```
 
 ## Force initialisation
 

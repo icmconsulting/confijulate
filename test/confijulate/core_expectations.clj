@@ -228,3 +228,13 @@
  	 	 (alter-meta! (find-ns 'confijulate.test-namespace) assoc :cfj-config true)
 		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
 		 (get-cfg :item)))
+
+;; convert string passed in on command line to int
+(expect
+ 23
+ (let [base-config {}]
+   (with-redefs [confijulate.env/cfj-system-property-names (constantly '("cfj.item"))
+                   confijulate.env/cfj-system-property-value (constantly "#s->i#23")]
+		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
+		 (init-ns 'confijulate.test-namespace)
+		 (get-cfg :item))))
