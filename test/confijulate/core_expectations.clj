@@ -234,7 +234,18 @@
  23
  (let [base-config {}]
    (with-redefs [confijulate.env/cfj-system-property-names (constantly '("cfj.item"))
-                   confijulate.env/cfj-system-property-value (constantly "#s->i#23")]
+                 confijulate.env/cfj-system-property-value (constantly "#s->i#23")]
 		 (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
 		 (init-ns 'confijulate.test-namespace)
 		 (get-cfg :item))))
+
+;; false value in should not return nil and look further down the config tree
+(expect
+ false
+ (let [base-config {:item true}
+       env-config {:item false}]
+   (with-redefs [confijulate.env/cfj-env (constantly "test-env")]
+     (intern 'confijulate.test-namespace (with-meta 'base {:cfj-base true}) base-config)
+     (intern 'confijulate.test-namespace (with-meta 'env {:cfj-env "test-env"}) env-config)
+     (init-ns 'confijulate.test-namespace)
+     (get-cfg :item))))

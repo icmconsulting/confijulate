@@ -147,7 +147,7 @@
 
 	(when-not (seq @config-heirachy) (find-and-init-config-ns))
 
-	(if-let [cfg-val (some #(get-in % kws) @config-heirachy)]
+	(let [cfg-val (first (drop-while nil? (map #(get-in % kws) @config-heirachy)))]
 		(if (map? cfg-val)
 			(merge-config-maps (reverse (map #(get-in % kws) @config-heirachy)))
 			cfg-val)))
