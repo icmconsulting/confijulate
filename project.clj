@@ -1,4 +1,4 @@
-(defproject confijulate "0.4.0"
+(defproject confijulate "0.4.1"
 	:description "Simple clojure application configuration library"
 	:url "https://github.com/bbbates/confijulate"
 	:license {:name "Eclipse Public License - v 1.0"

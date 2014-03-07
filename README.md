@@ -6,7 +6,7 @@ Simple clojure application configuration library.
 In leiningen:
 
 ```
-[confijulate "0.4.0"]
+[confijulate "0.4.1"]
 ```
 
 In Maven:
@@ -15,7 +15,7 @@ In Maven:
 <dependency>
   <groupId>confijulate</groupId>
   <artifactId>confijulate</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
 </dependency>
 ```
 
