@@ -33,3 +33,11 @@
 (expect
  231
  (cfj-type-coerce "#s->i#231"))
+
+(expect
+ true
+ (cfj-type-coerce "#s->b#true"))
+
+(expect
+ "Blah"
+ (cfj-type-coerce "Blah"))

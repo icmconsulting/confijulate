@@ -10,6 +10,10 @@
   [string-to-convert]
   (Boolean/valueOf string-to-convert))
 
+(def ^:private type-coercian-re
+	#"^(#(.+)#)?(.+)")
+
+
 (defn cfj-type-coerce
   "Parses the given String for the function name supplied in the prefix. String format is:
       #<optional namespace><function>#<string value>
@@ -18,12 +22,12 @@
       #s->i#123 will resolve to (confijulate.coerce/s->i \"123\")
       #another-namespace/my-function#abc will resolve to (another-namespace/my-function \"abc\")"
   [x]
-  (let [x-parsed (clojure.string/split x #"#")
-        x-symbol (symbol (second x-parsed))
-        x-func (resolve x-symbol)
-        x-coerce-func (ns-resolve 'confijulate.coerce x-symbol)]
-    (if x-func
-      (x-func (last x-parsed))
-      (if x-coerce-func
-        (x-coerce-func (last x-parsed))
-        x))))
+	(let [x-parsed (filter identity (re-find type-coercian-re x))]
+		(if-let [x-symbol (when (< 2 (count x-parsed)) (symbol (nth x-parsed 2)))]
+			(let [x-func (resolve x-symbol)
+						x-coerce-func (ns-resolve 'confijulate.coerce x-symbol)]
+				(cond
+				 x-func (x-func (last x-parsed))
+				 x-coerce-func (x-coerce-func (last x-parsed))
+				 :else x))
+			x)))
