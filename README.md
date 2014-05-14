@@ -79,7 +79,7 @@ Define a base configuration map in the config namespace. The base configuration 
 Define environment specific configuration maps, e.g. for QA region overrides.
 
 ```clojure
-(def ^{cfj-env "test"} test-config
+(def ^{:cfj-env "test"} test-config
 	{
 		:jndi-ds "jdbc/MyTestDatabase"
 	 	:scheduling
@@ -89,7 +89,7 @@ Define environment specific configuration maps, e.g. for QA region overrides.
 	}
 )
 
-(def ^{cfj-env "prod"} prod-config
+(def ^{:cfj-env "prod"} prod-config
 	{
 		:jndi-ds "jdbc/MyProdDatabase"
 	}
