@@ -1,6 +1,6 @@
 # confijulate
 
-*Note*: this library is now deprecated. Consider using [https://github.com/weavejester/environ](Environ) instead.
+*Note*: this library is now deprecated. Consider using [Environ](https://github.com/weavejester/environ) instead.
 
 Simple clojure application configuration library.
 
